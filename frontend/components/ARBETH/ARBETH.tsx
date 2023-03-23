@@ -62,9 +62,13 @@ const ARBETH = () => {
     return boundary - (((boundary % resolution) + resolution) % resolution);
   };
 
-  const approve = async () => {
-    if (wethContract === null || arbContract === null) return;
+  const approveWETH = async () => {
+    if (wethContract === null) return;
     await wethContract.approve(makerOrderManagerAddress, ethers.constants.MaxUint256);
+  };
+
+  const approveARB = async () => {
+    if (arbContract === null) return;
     await arbContract.approve(makerOrderManagerAddress, ethers.constants.MaxUint256);
   };
 
@@ -110,8 +114,11 @@ const ARBETH = () => {
     <>
       <Flex direction="column">
         <Heading>ARB/ETH</Heading>
-        <Button colorScheme="blue" onClick={() => approve()}>
-          Approve
+        <Button mt="1rem" colorScheme="blue" onClick={() => approveWETH()}>
+          Approve WETH
+        </Button>
+        <Button mt="0.2rem" colorScheme="blue" onClick={() => approveARB()}>
+          Approve ARB
         </Button>
         <Text fontSize="xl">Current Boundary: {currentBoundary}</Text>
         <Text as="b" fontSize="xs">
@@ -154,7 +161,7 @@ const ARBETH = () => {
             setTick(Number(e.target.value));
           }}
         />
-        <Button colorScheme="blue" onClick={() => submitMakerOrders()}>
+        <Button mt="1rem" colorScheme="blue" onClick={() => submitMakerOrders()}>
           Submit Maker Orders
         </Button>
       </Flex>

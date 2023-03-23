@@ -62,9 +62,13 @@ const GDXETH = () => {
     return boundary - (((boundary % resolution) + resolution) % resolution);
   };
 
-  const approve = async () => {
-    if (wethContract === null || gdxContract === null) return;
+  const approveWETH = async () => {
+    if (wethContract === null) return;
     await wethContract.approve(makerOrderManagerAddress, ethers.constants.MaxUint256);
+  };
+
+  const approveGDX = async () => {
+    if (gdxContract === null) return;
     await gdxContract.approve(makerOrderManagerAddress, ethers.constants.MaxUint256);
   };
 
@@ -110,8 +114,11 @@ const GDXETH = () => {
     <>
       <Flex direction="column">
         <Heading>GDX/ETH</Heading>
-        <Button colorScheme="blue" onClick={() => approve()}>
-          Approve
+        <Button mt="1rem" colorScheme="blue" onClick={() => approveWETH()}>
+          Approve WETH
+        </Button>
+        <Button mt="0.2rem" colorScheme="blue" onClick={() => approveGDX()}>
+          Approve GDX
         </Button>
         <Text fontSize="xl">Current Boundary: {currentBoundary}</Text>
         <Text as="b" fontSize="xs">
@@ -154,7 +161,7 @@ const GDXETH = () => {
             setTick(Number(e.target.value));
           }}
         />
-        <Button colorScheme="blue" onClick={() => submitMakerOrders()}>
+        <Button mt="1rem" colorScheme="blue" onClick={() => submitMakerOrders()}>
           Submit Maker Orders
         </Button>
       </Flex>
