@@ -3,11 +3,11 @@ import type { AppProps } from "next/app";
 import { EthereumClient, w3mConnectors, w3mProvider } from "@web3modal/ethereum";
 import { Web3Modal } from "@web3modal/react";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { arbitrum, mainnet, polygon, hardhat } from "wagmi/chains";
+import { hardhat, arbitrum } from "wagmi/chains";
 import { ChakraProvider } from "@chakra-ui/react";
 import Layout from "../components/Layout/Layout";
 
-const chains = [arbitrum, mainnet, polygon];
+const chains = [hardhat];
 const projectId = "bafef9eab75afb0441428a7b23f103a7";
 
 const { provider } = configureChains(chains, [w3mProvider({ projectId })]);
