@@ -11,7 +11,7 @@ const GDXETH = () => {
 
   const [makeAmountETH, setMakeAmountETH] = useState<string>("0");
   const [makeAmountGDX, setMakeAmountGDX] = useState<string>("0");
-  const [tick, setTick] = useState<number>(0);
+  const [tick, setTick] = useState<string>("0");
   const [boundaryLower, setBoundaryLower] = useState<number>(0);
   const [currentBoundary, setCurrentBoundary] = useState<number>(0);
 
@@ -81,7 +81,9 @@ const GDXETH = () => {
     datePlus1Hour.setHours(datePlus1Hour.getHours() + 1);
 
     let boundaryLowerToSubmit = boundaryLower;
-    boundaryLowerToSubmit += tick * resolution;
+    console.log(boundaryLowerToSubmit);
+    boundaryLowerToSubmit += Number(tick) * resolution;
+    console.log(boundaryLowerToSubmit);
 
     const amountETH = ethers.utils.parseEther(makeAmountETH);
     const ethParams = {
@@ -94,7 +96,7 @@ const GDXETH = () => {
       boundaryLower: boundaryLowerToSubmit,
       amount: amountETH,
     };
-    makerOrderManagerContract.placeMakerOrder(ethParams, { value: amountETH });
+    // makerOrderManagerContract.placeMakerOrder(ethParams, { value: amountETH });
 
     const amountGDX = ethers.utils.parseEther(makeAmountGDX);
     const gdxParams = {
@@ -107,7 +109,7 @@ const GDXETH = () => {
       boundaryLower: boundaryLowerToSubmit,
       amount: amountGDX,
     };
-    await makerOrderManagerContract.placeMakerOrder(gdxParams);
+    // await makerOrderManagerContract.placeMakerOrder(gdxParams);
   };
 
   return (
@@ -163,7 +165,7 @@ const GDXETH = () => {
           placeholder={"0"}
           value={tick}
           onChange={(e) => {
-            setTick(Number(e.target.value));
+            setTick(e.target.value);
           }}
         />
         <Button mt="1rem" colorScheme="blue" onClick={() => submitMakerOrders()}>

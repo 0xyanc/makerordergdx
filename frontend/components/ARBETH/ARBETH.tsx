@@ -11,7 +11,7 @@ const ARBETH = () => {
 
   const [makeAmountETH, setMakeAmountETH] = useState<string>("0");
   const [makeAmountARB, setMakeAmountARB] = useState<string>("0");
-  const [tick, setTick] = useState<number>(0);
+  const [tick, setTick] = useState<string>("0");
   const [boundaryLower, setBoundaryLower] = useState<number>(0);
   const [currentBoundary, setCurrentBoundary] = useState<number>(0);
 
@@ -82,7 +82,7 @@ const ARBETH = () => {
 
     let boundaryLowerToSubmit = boundaryLower;
     console.log(boundaryLowerToSubmit);
-    boundaryLowerToSubmit += tick * resolution;
+    boundaryLowerToSubmit += Number(tick) * resolution;
     console.log(boundaryLowerToSubmit);
 
     const amountETH = ethers.utils.parseEther(makeAmountETH);
@@ -163,7 +163,7 @@ const ARBETH = () => {
           placeholder={"0"}
           value={tick}
           onChange={(e) => {
-            setTick(Number(e.target.value));
+            setTick(e.target.value);
           }}
         />
         <Button mt="1rem" colorScheme="blue" onClick={() => submitMakerOrders()}>
