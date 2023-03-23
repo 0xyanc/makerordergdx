@@ -57,6 +57,7 @@ const GDXETH = () => {
     const latestSwapEvents = await gridContract.queryFilter("Swap", currentBlockNumber - 100, currentBlockNumber);
     for (const swap of latestSwapEvents) {
       setCurrentBoundary(getBoundaryLowerAtBoundary(swap.args?.boundary));
+      setBoundaryLower(getBoundaryLowerAtBoundary(swap.args?.boundary));
     }
   };
 
