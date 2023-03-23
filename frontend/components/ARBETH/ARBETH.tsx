@@ -17,8 +17,8 @@ const ARBETH = () => {
 
   const makerOrderManagerAddress: `0x${string}` = "0x36E56CC52d7A0Af506D1656765510cd930fF1595";
   const gridAddress: `0x${string}` = "0x8eb76679f7ed2a2ec0145a87fe35d67ff6e19aa6";
-  const wethTokenA: `0x${string}` = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"; // $WETH
-  const arbTokenB: `0x${string}` = "0x912CE59144191C1204E64559FE8253a0e49E6548"; // $ARB
+  const tokenA: `0x${string}` = "0x912CE59144191C1204E64559FE8253a0e49E6548"; // $ARB
+  const tokenB: `0x${string}` = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"; // $WETH
   const resolution: number = 5;
 
   let provider = useProvider();
@@ -41,12 +41,12 @@ const ARBETH = () => {
   });
 
   const wethContract = useContract({
-    address: wethTokenA,
+    address: tokenB,
     abi: IERC20UpgradeableAbi,
     signerOrProvider: signer,
   });
   const arbContract = useContract({
-    address: arbTokenB,
+    address: tokenA,
     abi: IERC20UpgradeableAbi,
     signerOrProvider: signer,
   });
@@ -83,8 +83,8 @@ const ARBETH = () => {
     const ethParams = {
       deadline,
       recipient: address,
-      tokenA: wethTokenA,
-      tokenB: arbTokenB,
+      tokenA: tokenA,
+      tokenB: tokenB,
       resolution,
       zero: false,
       boundaryLowerToSubmit,
@@ -96,8 +96,8 @@ const ARBETH = () => {
     const arbParams = {
       deadline,
       recipient: address,
-      tokenA: wethTokenA,
-      tokenB: arbTokenB,
+      tokenA: tokenA,
+      tokenB: tokenB,
       resolution,
       zero: true,
       boundaryLowerToSubmit,
