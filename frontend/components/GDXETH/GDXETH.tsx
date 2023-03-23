@@ -25,7 +25,7 @@ const GDXETH = () => {
   let { data: signer } = useSigner();
 
   useEffect(() => {
-    if (isConnected) getCurrentBoundaryLower();
+    if (isConnected) getLastTxBoundary();
   }, [address, isConnected]);
 
   const makerOrderManagerContract = useContract({
@@ -51,11 +51,13 @@ const GDXETH = () => {
     signerOrProvider: signer,
   });
 
-  const getCurrentBoundaryLower = async () => {
+  const getLastTxBoundary = async () => {
     if (gridContract === null) return;
-
-    const slot0 = await gridContract.slot0();
-    setCurrentBoundary(getBoundaryLowerAtBoundary(slot0.boundary));
+    const currentBlockNumber = await provider.getBlockNumber();
+    const latestSwapEvents = await gridContract.queryFilter("Swap", currentBlockNumber - 100, currentBlockNumber);
+    for (const swap of latestSwapEvents) {
+      setCurrentBoundary(getBoundaryLowerAtBoundary(swap.args?.boundary));
+    }
   };
 
   const getBoundaryLowerAtBoundary = (boundary: number) => {
@@ -118,7 +120,7 @@ const GDXETH = () => {
           Approve GDX
         </Button>
         <Text fontSize="xl">Current Boundary: {currentBoundary}</Text>
-        <Button colorScheme="blue" onClick={() => getCurrentBoundaryLower()}>
+        <Button colorScheme="blue" onClick={() => getLastTxBoundary()}>
           Update Boundary
         </Button>
         <Text as="b" fontSize="xs">
