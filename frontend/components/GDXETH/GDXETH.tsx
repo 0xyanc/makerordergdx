@@ -1,5 +1,5 @@
 import { Button, Flex, Heading, Input, Text } from "@chakra-ui/react";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useAccount, useContract, useProvider, useSigner } from "wagmi";
 import MakerOrderManagerAbi from "../../abis/MakerOrderManager.json";
@@ -73,38 +73,35 @@ const GDXETH = () => {
   };
 
   const submitMakerOrders = async () => {
-    if (makerOrderManagerContract === null || gridContract === null) return;
+    if (makerOrderManagerContract === null) return;
     const datePlus1Hour: Date = new Date();
     datePlus1Hour.setHours(datePlus1Hour.getHours() + 1);
-    const deadline = Math.floor(datePlus1Hour.getTime() / 1000);
 
     let boundaryLowerToSubmit = boundaryLower;
-    console.log(boundaryLowerToSubmit);
     boundaryLowerToSubmit += tick * resolution;
-    console.log(boundaryLowerToSubmit);
 
     const amountETH = ethers.utils.parseEther(makeAmountETH);
     const ethParams = {
-      deadline,
+      deadline: datePlus1Hour.getTime(),
       recipient: address,
       tokenA: gdxTokenA,
       tokenB: wethTokenB,
       resolution,
       zero: false,
-      boundaryLowerToSubmit,
+      boundaryLower: boundaryLowerToSubmit,
       amount: amountETH,
     };
-    await makerOrderManagerContract.placeMakerOrder(ethParams, { value: amountETH });
+    makerOrderManagerContract.placeMakerOrder(ethParams, { value: amountETH });
 
     const amountGDX = ethers.utils.parseEther(makeAmountGDX);
     const gdxParams = {
-      deadline,
+      deadline: datePlus1Hour.getTime(),
       recipient: address,
       tokenA: gdxTokenA,
       tokenB: wethTokenB,
       resolution,
       zero: true,
-      boundaryLowerToSubmit,
+      boundaryLower: boundaryLowerToSubmit,
       amount: amountGDX,
     };
     await makerOrderManagerContract.placeMakerOrder(gdxParams);
@@ -128,6 +125,7 @@ const GDXETH = () => {
           placeholder={"0"}
           value={makeAmountETH}
           onChange={(e) => {
+            console.log(e.target.value);
             setMakeAmountETH(e.target.value);
           }}
         />
@@ -138,6 +136,7 @@ const GDXETH = () => {
           placeholder={"0"}
           value={makeAmountGDX}
           onChange={(e) => {
+            console.log(e.target.value);
             setMakeAmountGDX(e.target.value);
           }}
         />

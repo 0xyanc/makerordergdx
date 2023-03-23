@@ -16,7 +16,7 @@ const ARBETH = () => {
   const [currentBoundary, setCurrentBoundary] = useState<number>(0);
 
   const makerOrderManagerAddress: `0x${string}` = "0x36E56CC52d7A0Af506D1656765510cd930fF1595";
-  const gridAddress: `0x${string}` = "0x8eb76679f7ed2a2ec0145a87fe35d67ff6e19aa6";
+  const gridAddress: `0x${string}` = "0x4f97f9c261d37f645669df94e5511f48d63064e2";
   const tokenA: `0x${string}` = "0x912CE59144191C1204E64559FE8253a0e49E6548"; // $ARB
   const tokenB: `0x${string}` = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"; // $WETH
   const resolution: number = 5;
@@ -76,7 +76,6 @@ const ARBETH = () => {
     if (makerOrderManagerContract === null || gridContract === null) return;
     const datePlus1Hour: Date = new Date();
     datePlus1Hour.setHours(datePlus1Hour.getHours() + 1);
-    const deadline = Math.floor(datePlus1Hour.getTime() / 1000);
 
     let boundaryLowerToSubmit = boundaryLower;
     console.log(boundaryLowerToSubmit);
@@ -85,26 +84,26 @@ const ARBETH = () => {
 
     const amountETH = ethers.utils.parseEther(makeAmountETH);
     const ethParams = {
-      deadline,
-      recipient: address,
-      tokenA: tokenA,
-      tokenB: tokenB,
-      resolution,
-      zero: false,
-      boundaryLowerToSubmit,
-      amount: amountETH,
-    };
-    await makerOrderManagerContract.placeMakerOrder(ethParams, { value: amountETH });
-
-    const amountARB = ethers.utils.parseEther(makeAmountARB);
-    const arbParams = {
-      deadline,
+      deadline: datePlus1Hour.getTime(),
       recipient: address,
       tokenA: tokenA,
       tokenB: tokenB,
       resolution,
       zero: true,
-      boundaryLowerToSubmit,
+      boundaryLower: boundaryLowerToSubmit,
+      amount: amountETH,
+    };
+    makerOrderManagerContract.placeMakerOrder(ethParams, { value: amountETH });
+
+    const amountARB = ethers.utils.parseEther(makeAmountARB);
+    const arbParams = {
+      deadline: datePlus1Hour.getTime(),
+      recipient: address,
+      tokenA: tokenA,
+      tokenB: tokenB,
+      resolution,
+      zero: false,
+      boundaryLower: boundaryLowerToSubmit,
       amount: amountARB,
     };
     await makerOrderManagerContract.placeMakerOrder(arbParams);
