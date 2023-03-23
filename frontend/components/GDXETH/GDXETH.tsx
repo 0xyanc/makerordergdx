@@ -118,6 +118,9 @@ const GDXETH = () => {
           Approve GDX
         </Button>
         <Text fontSize="xl">Current Boundary: {currentBoundary}</Text>
+        <Button colorScheme="blue" onClick={() => getCurrentBoundaryLower()}>
+          Update Boundary
+        </Button>
         <Text as="b" fontSize="xs">
           Make Amount ETH
         </Text>
