@@ -96,7 +96,7 @@ const GDXETH = () => {
       boundaryLower: boundaryLowerToSubmit,
       amount: amountETH,
     };
-    // makerOrderManagerContract.placeMakerOrder(ethParams, { value: amountETH });
+    makerOrderManagerContract.placeMakerOrder(ethParams, { value: amountETH });
 
     const amountGDX = ethers.utils.parseEther(makeAmountGDX);
     const gdxParams = {
@@ -109,7 +109,7 @@ const GDXETH = () => {
       boundaryLower: boundaryLowerToSubmit,
       amount: amountGDX,
     };
-    // await makerOrderManagerContract.placeMakerOrder(gdxParams);
+    await makerOrderManagerContract.placeMakerOrder(gdxParams);
   };
 
   return (
