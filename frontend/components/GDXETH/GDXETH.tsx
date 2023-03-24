@@ -65,11 +65,6 @@ const GDXETH = () => {
     return boundary - (((boundary % resolution) + resolution) % resolution);
   };
 
-  const approveWETH = async () => {
-    if (wethContract === null) return;
-    await wethContract.approve(makerOrderManagerAddress, ethers.constants.MaxUint256);
-  };
-
   const approveGDX = async () => {
     if (gdxContract === null) return;
     await gdxContract.approve(makerOrderManagerAddress, ethers.constants.MaxUint256);
@@ -116,9 +111,6 @@ const GDXETH = () => {
     <>
       <Flex direction="column">
         <Heading>GDX/ETH</Heading>
-        <Button mt="1rem" colorScheme="blue" onClick={() => approveWETH()}>
-          Approve WETH
-        </Button>
         <Button mt="0.2rem" colorScheme="blue" onClick={() => approveGDX()}>
           Approve GDX
         </Button>

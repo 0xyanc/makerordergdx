@@ -7,7 +7,7 @@ import { hardhat, arbitrum } from "wagmi/chains";
 import { ChakraProvider } from "@chakra-ui/react";
 import Layout from "../components/Layout/Layout";
 
-const chains = [arbitrum];
+const chains = [hardhat];
 const projectId = "bafef9eab75afb0441428a7b23f103a7";
 
 const { provider } = configureChains(chains, [w3mProvider({ projectId })]);

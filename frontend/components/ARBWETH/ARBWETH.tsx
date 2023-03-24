@@ -6,7 +6,7 @@ import MakerOrderManagerAbi from "../../abis/MakerOrderManager.json";
 import GridAbi from "../../abis/Grid.json";
 import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
 
-const ARBETH = () => {
+const ARBWETH = () => {
   const { address, isConnected } = useAccount();
 
   const [makeAmountETH, setMakeAmountETH] = useState<string>("0");
@@ -65,6 +65,11 @@ const ARBETH = () => {
     return boundary - (((boundary % resolution) + resolution) % resolution);
   };
 
+  const approveWETH = async () => {
+    if (wethContract === null) return;
+    await wethContract.approve(makerOrderManagerAddress, ethers.constants.MaxUint256);
+  };
+
   const approveARB = async () => {
     if (arbContract === null) return;
     await arbContract.approve(makerOrderManagerAddress, ethers.constants.MaxUint256);
@@ -75,10 +80,26 @@ const ARBETH = () => {
     const datePlus1Hour: Date = new Date();
     datePlus1Hour.setHours(datePlus1Hour.getHours() + 1);
 
-    let boundaryLowerToSubmit = boundaryLower;
-    boundaryLowerToSubmit += Number(tick) * resolution;
+    const makeAmountETHArray = makeAmountETH.split(",");
+    const makeAmountARBArray = makeAmountARB.split(",");
+    const ticksArray = tick.split(",");
+    if (makeAmountETHArray.length !== ticksArray.length || makeAmountARBArray.length !== ticksArray.length)
+      throw Error("Amount parameters and ticks are not the same length!");
+    let boundaryAndAmountParamETH = [];
+    let boundaryAndAmountParamARB = [];
+    for (let i = 0; i < ticksArray.length; i++) {
+      let boundaryLowerToSubmit = boundaryLower;
+      boundaryLowerToSubmit += Number(ticksArray[i]) * resolution;
+      boundaryAndAmountParamETH.push({
+        boundaryLower: boundaryLowerToSubmit,
+        amount: ethers.utils.parseEther(makeAmountETHArray[i]),
+      });
+      boundaryAndAmountParamARB.push({
+        boundaryLower: boundaryLowerToSubmit,
+        amount: ethers.utils.parseEther(makeAmountARBArray[i]),
+      });
+    }
 
-    const amountETH = ethers.utils.parseEther(makeAmountETH);
     const ethParams = {
       deadline: datePlus1Hour.getTime(),
       recipient: address,
@@ -86,12 +107,10 @@ const ARBETH = () => {
       tokenB: tokenB,
       resolution,
       zero: true,
-      boundaryLower: boundaryLowerToSubmit,
-      amount: amountETH,
+      orders: boundaryAndAmountParamETH,
     };
-    makerOrderManagerContract.placeMakerOrder(ethParams, { value: amountETH });
+    makerOrderManagerContract.placeMakerOrderInBatch(ethParams);
 
-    const amountARB = ethers.utils.parseEther(makeAmountARB);
     const arbParams = {
       deadline: datePlus1Hour.getTime(),
       recipient: address,
@@ -99,16 +118,18 @@ const ARBETH = () => {
       tokenB: tokenB,
       resolution,
       zero: false,
-      boundaryLower: boundaryLowerToSubmit,
-      amount: amountARB,
+      orders: boundaryAndAmountParamARB,
     };
-    await makerOrderManagerContract.placeMakerOrder(arbParams);
+    await makerOrderManagerContract.placeMakerOrderInBatch(arbParams);
   };
 
   return (
     <>
       <Flex direction="column">
-        <Heading>ARB/ETH</Heading>
+        <Heading>ARB/WETH</Heading>
+        <Button mt="1rem" colorScheme="blue" onClick={() => approveWETH()}>
+          Approve WETH
+        </Button>
         <Button mt="0.2rem" colorScheme="blue" onClick={() => approveARB()}>
           Approve ARB
         </Button>
@@ -117,7 +138,7 @@ const ARBETH = () => {
           Update Boundary
         </Button>
         <Text as="b" fontSize="xs">
-          Make Amount ETH
+          Make Amount WETH
         </Text>
         <Input
           placeholder={"0"}
@@ -164,4 +185,4 @@ const ARBETH = () => {
   );
 };
 
-export default ARBETH;
+export default ARBWETH;
