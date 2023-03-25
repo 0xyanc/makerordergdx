@@ -14,12 +14,15 @@ const GDXETH = () => {
   const [tick, setTick] = useState<string>("0");
   const [boundaryLower, setBoundaryLower] = useState<number>(0);
   const [currentBoundary, setCurrentBoundary] = useState<number>(0);
+  const [balanceETH, setBalanceETH] = useState<number>(0);
+  const [balanceGDX, setBalanceGDX] = useState<number>(0);
 
   const makerOrderManagerAddress: `0x${string}` = "0x36E56CC52d7A0Af506D1656765510cd930fF1595";
   const gridAddress: `0x${string}` = "0x8eb76679f7ed2a2ec0145a87fe35d67ff6e19aa6";
   const gdxTokenA: `0x${string}` = "0x2F27118E3D2332aFb7d165140Cf1bB127eA6975d";
   const wethTokenB: `0x${string}` = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1";
   const resolution: number = 5;
+  const numberFormat = new Intl.NumberFormat("en-US", { maximumFractionDigits: 4 });
 
   let provider = useProvider();
   let { data: signer } = useSigner();
@@ -36,34 +39,23 @@ const GDXETH = () => {
     signerOrProvider: provider,
   });
 
-  const wethContract = useContract({
-    address: wethTokenB,
-    abi: IERC20UpgradeableAbi,
-    signerOrProvider: signer,
-  });
   const gdxContract = useContract({
     address: gdxTokenA,
     abi: IERC20UpgradeableAbi,
     signerOrProvider: signer,
   });
 
-  const getCurrentBoundaryLower = async () => {
-    if (gridContract === null) return;
+  const updateInfo = async () => {
+    if (gridContract === null || gdxContract === null || !address) return;
 
     const slot0 = await gridContract.slot0();
     setCurrentBoundary(getBoundaryLowerAtBoundary(slot0.boundary));
     setBoundaryLower(getBoundaryLowerAtBoundary(slot0.boundary));
+    const balanceETH = await provider.getBalance(address.toString());
+    const balanceGDX = await gdxContract.balanceOf(address);
+    setBalanceGDX(Number(ethers.utils.formatEther(balanceGDX)));
+    setBalanceETH(Number(ethers.utils.formatEther(balanceETH)));
   };
-
-  // const getLastTxBoundary = async () => {
-  //   if (gridContract === null) return;
-  //   const currentBlockNumber = await provider.getBlockNumber();
-  //   const latestSwapEvents = await gridContract.queryFilter("Swap", currentBlockNumber - 100, currentBlockNumber);
-  //   for (const swap of latestSwapEvents) {
-  //     setCurrentBoundary(getBoundaryLowerAtBoundary(swap.args?.boundary));
-  //     setBoundaryLower(getBoundaryLowerAtBoundary(swap.args?.boundary));
-  //   }
-  // };
 
   const getBoundaryLowerAtBoundary = (boundary: number) => {
     return boundary - (((boundary % resolution) + resolution) % resolution);
@@ -119,12 +111,17 @@ const GDXETH = () => {
           Approve GDX
         </Button>
         <Text fontSize="xl">Current Boundary: {currentBoundary}</Text>
-        <Button colorScheme="blue" onClick={() => getCurrentBoundaryLower()}>
-          Update Boundary
+        <Button colorScheme="blue" onClick={() => updateInfo()}>
+          Update Info
         </Button>
-        <Text as="b" fontSize="xs">
-          Make Amount ETH
-        </Text>
+        <Flex justifyContent="space-between">
+          <Text as="b" fontSize="xs">
+            Amount ETH
+          </Text>
+          <Text fontSize="xs">
+            Balance:<Text>{numberFormat.format(balanceETH)}</Text>
+          </Text>
+        </Flex>
         <Input
           placeholder={"0"}
           value={makeAmountETH}
@@ -133,9 +130,14 @@ const GDXETH = () => {
             setMakeAmountETH(e.target.value);
           }}
         />
-        <Text as="b" fontSize="xs">
-          Make Amount GDX
-        </Text>
+        <Flex justifyContent="space-between">
+          <Text as="b" fontSize="xs">
+            Amount GDX
+          </Text>
+          <Text fontSize="xs">
+            Balance:<Text>{numberFormat.format(balanceGDX)}</Text>
+          </Text>
+        </Flex>
         <Input
           placeholder={"0"}
           value={makeAmountGDX}
