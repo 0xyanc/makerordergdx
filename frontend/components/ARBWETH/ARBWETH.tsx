@@ -1,21 +1,25 @@
-import { Button, Flex, Heading, Input, Text } from "@chakra-ui/react";
+import { Button, Divider, Flex, Heading, Input, Text } from "@chakra-ui/react";
 import { ethers } from "ethers";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAccount, useContract, useProvider, useSigner } from "wagmi";
 import MakerOrderManagerAbi from "../../abis/MakerOrderManager.json";
 import GridAbi from "../../abis/Grid.json";
 import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
 
 const ARBWETH = () => {
-  const { address, isConnected } = useAccount();
+  const { address } = useAccount();
 
   const [makeAmountETH, setMakeAmountETH] = useState<string>("0");
   const [makeAmountARB, setMakeAmountARB] = useState<string>("0");
-  const [tick, setTick] = useState<string>("0");
+  const [tickWETH, setTickWETH] = useState<string>("0");
+  const [tickARB, setTickARB] = useState<string>("0");
   const [boundaryLower, setBoundaryLower] = useState<number>(0);
   const [currentBoundary, setCurrentBoundary] = useState<number>(0);
   const [balanceWETH, setBalanceWETH] = useState<number>(0);
   const [balanceARB, setbalanceARB] = useState<number>(0);
+  const [currentTick, setCurrentTick] = useState<string>("0");
+  const [targetTick, setTargetTick] = useState<string>("0");
+  const [numberOfTicks, setNumberOfTicks] = useState<number>(0);
 
   const makerOrderManagerAddress: `0x${string}` = "0x36E56CC52d7A0Af506D1656765510cd930fF1595";
   const gridAddress: `0x${string}` = "0x4f97f9c261d37f645669df94e5511f48d63064e2";
@@ -83,18 +87,23 @@ const ARBWETH = () => {
 
     const makeAmountETHArray = makeAmountETH.split(",");
     const makeAmountARBArray = makeAmountARB.split(",");
-    const ticksArray = tick.split(",");
-    if (makeAmountETHArray.length !== ticksArray.length || makeAmountARBArray.length !== ticksArray.length)
+    const ticksArrayWETH = tickWETH.split(",");
+    const ticksArrayARB = tickARB.split(",");
+    if (makeAmountETHArray.length !== ticksArrayWETH.length || makeAmountARBArray.length !== ticksArrayARB.length)
       throw Error("Amount parameters and ticks are not the same length!");
     let boundaryAndAmountParamETH = [];
     let boundaryAndAmountParamARB = [];
-    for (let i = 0; i < ticksArray.length; i++) {
+    for (let i = 0; i < ticksArrayWETH.length; i++) {
       let boundaryLowerToSubmit = boundaryLower;
-      boundaryLowerToSubmit += Number(ticksArray[i]) * resolution;
+      boundaryLowerToSubmit += Number(ticksArrayWETH[i]) * resolution;
       boundaryAndAmountParamETH.push({
         boundaryLower: boundaryLowerToSubmit,
         amount: ethers.utils.parseEther(makeAmountETHArray[i]),
       });
+    }
+    for (let i = 0; i < ticksArrayARB.length; i++) {
+      let boundaryLowerToSubmit = boundaryLower;
+      boundaryLowerToSubmit += Number(ticksArrayARB[i]) * resolution;
       boundaryAndAmountParamARB.push({
         boundaryLower: boundaryLowerToSubmit,
         amount: ethers.utils.parseEther(makeAmountARBArray[i]),
@@ -124,8 +133,22 @@ const ARBWETH = () => {
     await makerOrderManagerContract.placeMakerOrderInBatch(arbParams);
   };
 
+  const calculateNumberOfTicks = () => {
+    let lowerTick = currentTick > targetTick ? targetTick : currentTick;
+    let higherTick = currentTick > targetTick ? currentTick : targetTick;
+
+    let nbTicks = 0;
+    let lowerTickNumber = Number(lowerTick);
+    let higherTickNumber = Number(higherTick);
+    while (lowerTickNumber < higherTickNumber) {
+      lowerTickNumber *= 1.0005;
+      nbTicks++;
+    }
+    setNumberOfTicks(nbTicks);
+  };
+
   return (
-    <>
+    <Flex justify="space-around" w="100%">
       <Flex direction="column">
         <Heading>ARB/WETH</Heading>
         <Button mt="1rem" colorScheme="blue" onClick={() => approveWETH()}>
@@ -134,10 +157,28 @@ const ARBWETH = () => {
         <Button mt="0.2rem" colorScheme="blue" onClick={() => approveARB()}>
           Approve ARB
         </Button>
-        <Text fontSize="xl">Current Boundary: {currentBoundary}</Text>
+        <Text mt="5rem" as="b" fontSize="xs">
+          Boundary Lower
+        </Text>
+        <Input
+          placeholder={"0"}
+          value={boundaryLower}
+          onChange={(e) => {
+            setBoundaryLower(Number(e.target.value));
+          }}
+        />
         <Button colorScheme="blue" onClick={() => updateInfo()}>
           Update Boundary
         </Button>
+        <Text fontSize="xl">Current Boundary: {currentBoundary}</Text>
+      </Flex>
+
+      <Divider orientation="vertical" />
+      <Flex direction="column">
+        <Heading>Maker Orders</Heading>
+        <Heading mt="1rem" fontSize="xl">
+          Buy ARB
+        </Heading>
         <Flex justifyContent="space-between">
           <Text as="b" fontSize="xs">
             Amount WETH
@@ -153,6 +194,20 @@ const ARBWETH = () => {
             setMakeAmountETH(e.target.value);
           }}
         />
+        <Text as="b" fontSize="xs">
+          Ticks up or down from current price <br /> (negative means higher tick)
+        </Text>
+        <Input
+          placeholder={"0"}
+          value={tickWETH}
+          onChange={(e) => {
+            setTickWETH(e.target.value);
+          }}
+        />
+        <Divider mt="1rem" />
+        <Heading mt="1rem" fontSize="xl">
+          Sell ARB
+        </Heading>
         <Flex justifyContent="space-between">
           <Text as="b" fontSize="xs">
             Amount ARB
@@ -168,31 +223,52 @@ const ARBWETH = () => {
             setMakeAmountARB(e.target.value);
           }}
         />
+
         <Text as="b" fontSize="xs">
-          Boundary Lower
+          Ticks up or down from current price <br /> (negative means higher tick)
         </Text>
         <Input
           placeholder={"0"}
-          value={boundaryLower}
+          value={tickARB}
           onChange={(e) => {
-            setBoundaryLower(Number(e.target.value));
-          }}
-        />
-        <Text as="b" fontSize="xs">
-          Ticks up or down from current price
-        </Text>
-        <Input
-          placeholder={"0"}
-          value={tick}
-          onChange={(e) => {
-            setTick(e.target.value);
+            setTickARB(e.target.value);
           }}
         />
         <Button mt="1rem" colorScheme="blue" onClick={() => submitMakerOrders()}>
           Submit Maker Orders
         </Button>
       </Flex>
-    </>
+      <Divider orientation="vertical" />
+      <Flex direction="column">
+        <Heading>Tick calculator</Heading>
+        <Text as="b" fontSize="xs">
+          Current tick
+        </Text>
+        <Input
+          placeholder={"0"}
+          value={currentTick}
+          onChange={(e) => {
+            setCurrentTick(e.target.value);
+          }}
+        ></Input>
+        <Text as="b" fontSize="xs">
+          Target tick
+        </Text>
+        <Input
+          placeholder={"0"}
+          value={targetTick}
+          onChange={(e) => {
+            setTargetTick(e.target.value);
+          }}
+        ></Input>
+        <Button mt="1rem" onClick={() => calculateNumberOfTicks()} colorScheme="blue">
+          Calculate
+        </Button>
+        <Text as="b" mt="1rem">
+          Number of ticks: {numberOfTicks}
+        </Text>
+      </Flex>
+    </Flex>
   );
 };
 
