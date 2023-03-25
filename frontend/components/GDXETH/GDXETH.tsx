@@ -24,10 +24,6 @@ const GDXETH = () => {
   let provider = useProvider();
   let { data: signer } = useSigner();
 
-  useEffect(() => {
-    if (isConnected) getLastTxBoundary();
-  }, [address, isConnected]);
-
   const makerOrderManagerContract = useContract({
     address: makerOrderManagerAddress,
     abi: MakerOrderManagerAbi,
@@ -51,15 +47,23 @@ const GDXETH = () => {
     signerOrProvider: signer,
   });
 
-  const getLastTxBoundary = async () => {
+  const getCurrentBoundaryLower = async () => {
     if (gridContract === null) return;
-    const currentBlockNumber = await provider.getBlockNumber();
-    const latestSwapEvents = await gridContract.queryFilter("Swap", currentBlockNumber - 100, currentBlockNumber);
-    for (const swap of latestSwapEvents) {
-      setCurrentBoundary(getBoundaryLowerAtBoundary(swap.args?.boundary));
-      setBoundaryLower(getBoundaryLowerAtBoundary(swap.args?.boundary));
-    }
+
+    const slot0 = await gridContract.slot0();
+    setCurrentBoundary(getBoundaryLowerAtBoundary(slot0.boundary));
+    setBoundaryLower(getBoundaryLowerAtBoundary(slot0.boundary));
   };
+
+  // const getLastTxBoundary = async () => {
+  //   if (gridContract === null) return;
+  //   const currentBlockNumber = await provider.getBlockNumber();
+  //   const latestSwapEvents = await gridContract.queryFilter("Swap", currentBlockNumber - 100, currentBlockNumber);
+  //   for (const swap of latestSwapEvents) {
+  //     setCurrentBoundary(getBoundaryLowerAtBoundary(swap.args?.boundary));
+  //     setBoundaryLower(getBoundaryLowerAtBoundary(swap.args?.boundary));
+  //   }
+  // };
 
   const getBoundaryLowerAtBoundary = (boundary: number) => {
     return boundary - (((boundary % resolution) + resolution) % resolution);
@@ -115,7 +119,7 @@ const GDXETH = () => {
           Approve GDX
         </Button>
         <Text fontSize="xl">Current Boundary: {currentBoundary}</Text>
-        <Button colorScheme="blue" onClick={() => getLastTxBoundary()}>
+        <Button colorScheme="blue" onClick={() => getCurrentBoundaryLower()}>
           Update Boundary
         </Button>
         <Text as="b" fontSize="xs">
