@@ -1,4 +1,4 @@
-import { Button, Flex, Heading, Input, Text } from "@chakra-ui/react";
+import { Button, Divider, Flex, Heading, Input, Text } from "@chakra-ui/react";
 import { BigNumber, ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useAccount, useContract, useProvider, useSigner } from "wagmi";
@@ -6,13 +6,12 @@ import MakerOrderManagerAbi from "../../abis/MakerOrderManager.json";
 import GridAbi from "../../abis/Grid.json";
 import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
 import TickCalculator from "../TickCalculator/TickCalculator";
+import MakerOrderWithWETH from "../MakerOrderInBatch/MakerOrderInBatch";
+import Info from "../Info/Info";
 
 const GDXWETH = () => {
   const { address, isConnected } = useAccount();
 
-  const [makeAmountETH, setMakeAmountETH] = useState<string>("0");
-  const [makeAmountGDX, setMakeAmountGDX] = useState<string>("0");
-  const [tick, setTick] = useState<string>("0");
   const [boundaryLower, setBoundaryLower] = useState<number>(0);
   const [currentBoundary, setCurrentBoundary] = useState<number>(0);
   const [balanceWETH, setBalanceWETH] = useState<number>(0);
@@ -77,25 +76,30 @@ const GDXWETH = () => {
     await gdxContract.approve(makerOrderManagerAddress, ethers.constants.MaxUint256);
   };
 
-  const submitMakerOrders = async () => {
+  const submitMakerOrders = async (makeAmountETH: string, makeAmountGDX: string, tickWETH: string, tickGDX: string) => {
     if (makerOrderManagerContract === null) return;
     const datePlus1Hour: Date = new Date();
     datePlus1Hour.setHours(datePlus1Hour.getHours() + 1);
 
     const makeAmountETHArray = makeAmountETH.split(",");
     const makeAmountGDXArray = makeAmountGDX.split(",");
-    const ticksArray = tick.split(",");
-    if (makeAmountETHArray.length !== ticksArray.length || makeAmountGDXArray.length !== ticksArray.length)
+    const ticksArrayWETH = tickWETH.split(",");
+    const ticksArrayGDX = tickGDX.split(",");
+    if (makeAmountETHArray.length !== ticksArrayWETH.length || makeAmountGDXArray.length !== ticksArrayGDX.length)
       throw Error("Amount parameters and ticks are not the same length!");
     let boundaryAndAmountParamETH = [];
     let boundaryAndAmountParamGDX = [];
-    for (let i = 0; i < ticksArray.length; i++) {
+    for (let i = 0; i < ticksArrayWETH.length; i++) {
       let boundaryLowerToSubmit = boundaryLower;
-      boundaryLowerToSubmit += Number(ticksArray[i]) * resolution;
+      boundaryLowerToSubmit += Number(ticksArrayWETH[i]) * resolution;
       boundaryAndAmountParamETH.push({
         boundaryLower: boundaryLowerToSubmit,
         amount: ethers.utils.parseEther(makeAmountETHArray[i]),
       });
+    }
+    for (let i = 0; i < ticksArrayGDX.length; i++) {
+      let boundaryLowerToSubmit = boundaryLower;
+      boundaryLowerToSubmit += Number(ticksArrayGDX[i]) * resolution;
       boundaryAndAmountParamGDX.push({
         boundaryLower: boundaryLowerToSubmit,
         amount: ethers.utils.parseEther(makeAmountGDXArray[i]),
@@ -128,72 +132,23 @@ const GDXWETH = () => {
 
   return (
     <Flex justify="space-around" w="100%">
-      <Flex direction="column">
-        <Heading>GDX/WETH</Heading>
-        <Button mt="1rem" colorScheme="blue" onClick={() => approveWETH()}>
-          Approve WETH
-        </Button>
-        <Button mt="0.2rem" colorScheme="blue" onClick={() => approveGDX()}>
-          Approve GDX
-        </Button>
-        <Text fontSize="xl">Current Boundary: {currentBoundary}</Text>
-        <Button colorScheme="blue" onClick={() => updateInfo()}>
-          Update Boundary
-        </Button>
-        <Flex justifyContent="space-between">
-          <Text as="b" fontSize="xs">
-            Amount WETH
-          </Text>
-          <Text fontSize="xs">
-            Balance:<Text>{numberFormat.format(balanceWETH)}</Text>
-          </Text>
-        </Flex>
-        <Input
-          placeholder={"0"}
-          value={makeAmountETH}
-          onChange={(e) => {
-            setMakeAmountETH(e.target.value);
-          }}
-        />
-        <Flex justifyContent="space-between">
-          <Text as="b" fontSize="xs">
-            Amount GDX
-          </Text>
-          <Text fontSize="xs">
-            Balance:<Text>{numberFormat.format(balanceGDX)}</Text>
-          </Text>
-        </Flex>
-        <Input
-          placeholder={"0"}
-          value={makeAmountGDX}
-          onChange={(e) => {
-            setMakeAmountGDX(e.target.value);
-          }}
-        />
-        <Text as="b" fontSize="xs">
-          Boundary Lower
-        </Text>
-        <Input
-          placeholder={"0"}
-          value={boundaryLower}
-          onChange={(e) => {
-            setBoundaryLower(Number(e.target.value));
-          }}
-        />
-        <Text as="b" fontSize="xs">
-          Ticks up or down from current price
-        </Text>
-        <Input
-          placeholder={"0"}
-          value={tick}
-          onChange={(e) => {
-            setTick(e.target.value);
-          }}
-        />
-        <Button mt="1rem" colorScheme="blue" onClick={() => submitMakerOrders()}>
-          Submit Maker Orders
-        </Button>
-      </Flex>
+      <Info
+        token={"GDX"}
+        approveWETH={approveWETH}
+        approveToken={approveGDX}
+        boundaryLower={boundaryLower}
+        setBoundaryLower={setBoundaryLower}
+        updateInfo={updateInfo}
+        currentBoundary={currentBoundary}
+      />
+      <Divider orientation="vertical" />
+      <MakerOrderWithWETH
+        token={"GDX"}
+        balanceWETH={balanceWETH}
+        balanceToken={balanceGDX}
+        submitMakerOrders={submitMakerOrders}
+      />
+      <Divider orientation="vertical" />
       <TickCalculator />
     </Flex>
   );

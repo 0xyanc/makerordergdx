@@ -2,6 +2,7 @@ import { Button, Flex, Heading, Input, Text } from "@chakra-ui/react";
 import { Dispatch, SetStateAction } from "react";
 
 const Info = ({
+  token,
   approveWETH,
   approveToken,
   boundaryLower,
@@ -9,6 +10,7 @@ const Info = ({
   updateInfo,
   currentBoundary,
 }: {
+  token: string;
   approveWETH: () => Promise<void>;
   approveToken: () => Promise<void>;
   boundaryLower: number;
@@ -18,12 +20,12 @@ const Info = ({
 }) => {
   return (
     <Flex direction="column">
-      <Heading>ARB/WETH</Heading>
+      <Heading>{token}/WETH</Heading>
       <Button mt="1rem" colorScheme="blue" onClick={() => approveWETH()}>
         Approve WETH
       </Button>
       <Button mt="0.2rem" colorScheme="blue" onClick={() => approveToken()}>
-        Approve ARB
+        Approve {token}
       </Button>
       <Text mt="5rem" as="b" fontSize="xs">
         Boundary Lower

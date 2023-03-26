@@ -7,14 +7,11 @@ import GridAbi from "../../abis/Grid.json";
 import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
 import TickCalculator from "../TickCalculator/TickCalculator";
 import Info from "../Info/Info";
+import MakerOrderWithWETH from "../MakerOrderInBatch/MakerOrderInBatch";
 
 const ARBWETH = () => {
   const { address } = useAccount();
 
-  const [makeAmountETH, setMakeAmountETH] = useState<string>("0");
-  const [makeAmountARB, setMakeAmountARB] = useState<string>("0");
-  const [tickWETH, setTickWETH] = useState<string>("0");
-  const [tickARB, setTickARB] = useState<string>("0");
   const [boundaryLower, setBoundaryLower] = useState<number>(0);
   const [currentBoundary, setCurrentBoundary] = useState<number>(0);
   const [balanceWETH, setBalanceWETH] = useState<number>(0);
@@ -25,7 +22,6 @@ const ARBWETH = () => {
   const tokenA: `0x${string}` = "0x912CE59144191C1204E64559FE8253a0e49E6548"; // $ARB
   const tokenB: `0x${string}` = "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"; // $WETH
   const resolution: number = 5;
-  const numberFormat = new Intl.NumberFormat("en-US", { maximumFractionDigits: 4 });
 
   let provider = useProvider();
   let { data: signer } = useSigner();
@@ -79,7 +75,7 @@ const ARBWETH = () => {
     await arbContract.approve(makerOrderManagerAddress, ethers.constants.MaxUint256);
   };
 
-  const submitMakerOrders = async () => {
+  const submitMakerOrders = async (makeAmountETH: string, makeAmountARB: string, tickWETH: string, tickARB: string) => {
     if (makerOrderManagerContract === null || gridContract === null) return;
     const datePlus1Hour: Date = new Date();
     datePlus1Hour.setHours(datePlus1Hour.getHours() + 1);
@@ -135,6 +131,7 @@ const ARBWETH = () => {
   return (
     <Flex justify="space-around" w="100%">
       <Info
+        token={"ARB"}
         approveWETH={approveWETH}
         approveToken={approveARB}
         boundaryLower={boundaryLower}
@@ -144,70 +141,12 @@ const ARBWETH = () => {
       />
 
       <Divider orientation="vertical" />
-      <Flex direction="column">
-        <Heading>Maker Orders</Heading>
-        <Heading mt="1rem" fontSize="xl">
-          Buy ARB
-        </Heading>
-        <Flex justifyContent="space-between">
-          <Text as="b" fontSize="xs">
-            Amount WETH
-          </Text>
-          <Text fontSize="xs">
-            Balance:<Text>{numberFormat.format(balanceWETH)}</Text>
-          </Text>
-        </Flex>
-        <Input
-          placeholder={"0"}
-          value={makeAmountETH}
-          onChange={(e) => {
-            setMakeAmountETH(e.target.value);
-          }}
-        />
-        <Text as="b" fontSize="xs">
-          Ticks up or down from current price <br /> (negative means higher tick)
-        </Text>
-        <Input
-          placeholder={"0"}
-          value={tickWETH}
-          onChange={(e) => {
-            setTickWETH(e.target.value);
-          }}
-        />
-        <Divider mt="1rem" />
-        <Heading mt="1rem" fontSize="xl">
-          Sell ARB
-        </Heading>
-        <Flex justifyContent="space-between">
-          <Text as="b" fontSize="xs">
-            Amount ARB
-          </Text>
-          <Text fontSize="xs">
-            Balance:<Text>{numberFormat.format(balanceARB)}</Text>
-          </Text>
-        </Flex>
-        <Input
-          placeholder={"0"}
-          value={makeAmountARB}
-          onChange={(e) => {
-            setMakeAmountARB(e.target.value);
-          }}
-        />
-
-        <Text as="b" fontSize="xs">
-          Ticks up or down from current price <br /> (negative means higher tick)
-        </Text>
-        <Input
-          placeholder={"0"}
-          value={tickARB}
-          onChange={(e) => {
-            setTickARB(e.target.value);
-          }}
-        />
-        <Button mt="1rem" colorScheme="blue" onClick={() => submitMakerOrders()}>
-          Submit Maker Orders
-        </Button>
-      </Flex>
+      <MakerOrderWithWETH
+        token={"ARB"}
+        balanceWETH={balanceWETH}
+        balanceToken={balanceARB}
+        submitMakerOrders={submitMakerOrders}
+      />
       <Divider orientation="vertical" />
       <TickCalculator />
     </Flex>
