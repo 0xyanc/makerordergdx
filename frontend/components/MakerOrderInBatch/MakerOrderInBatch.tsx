@@ -1,7 +1,7 @@
 import { Button, Divider, Flex, Heading, Input, Text } from "@chakra-ui/react";
 import { useState } from "react";
 
-const MakerOrderWithWETH = ({
+const MakerOrderInBatch = ({
   token,
   balanceWETH,
   balanceToken,
@@ -90,4 +90,4 @@ const MakerOrderWithWETH = ({
   );
 };
 
-export default MakerOrderWithWETH;
+export default MakerOrderInBatch;
