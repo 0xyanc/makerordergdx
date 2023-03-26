@@ -90,7 +90,7 @@ const ARBWETH = () => {
     let boundaryAndAmountParamARB = [];
     for (let i = 0; i < ticksArrayWETH.length; i++) {
       let boundaryLowerToSubmit = boundaryLower;
-      boundaryLowerToSubmit += Number(ticksArrayWETH[i]) * resolution;
+      boundaryLowerToSubmit += Number(ticksArrayWETH[i]) * resolution * -1;
       boundaryAndAmountParamETH.push({
         boundaryLower: boundaryLowerToSubmit,
         amount: ethers.utils.parseEther(makeAmountETHArray[i]),
@@ -98,7 +98,7 @@ const ARBWETH = () => {
     }
     for (let i = 0; i < ticksArrayARB.length; i++) {
       let boundaryLowerToSubmit = boundaryLower;
-      boundaryLowerToSubmit += Number(ticksArrayARB[i]) * resolution;
+      boundaryLowerToSubmit += Number(ticksArrayARB[i]) * resolution * -1;
       boundaryAndAmountParamARB.push({
         boundaryLower: boundaryLowerToSubmit,
         amount: ethers.utils.parseEther(makeAmountARBArray[i]),
