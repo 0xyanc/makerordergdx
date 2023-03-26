@@ -6,6 +6,7 @@ import MakerOrderManagerAbi from "../../abis/MakerOrderManager.json";
 import GridAbi from "../../abis/Grid.json";
 import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
 import TickCalculator from "../TickCalculator/TickCalculator";
+import Info from "../Info/Info";
 
 const ARBWETH = () => {
   const { address } = useAccount();
@@ -133,29 +134,14 @@ const ARBWETH = () => {
 
   return (
     <Flex justify="space-around" w="100%">
-      <Flex direction="column">
-        <Heading>ARB/WETH</Heading>
-        <Button mt="1rem" colorScheme="blue" onClick={() => approveWETH()}>
-          Approve WETH
-        </Button>
-        <Button mt="0.2rem" colorScheme="blue" onClick={() => approveARB()}>
-          Approve ARB
-        </Button>
-        <Text mt="5rem" as="b" fontSize="xs">
-          Boundary Lower
-        </Text>
-        <Input
-          placeholder={"0"}
-          value={boundaryLower}
-          onChange={(e) => {
-            setBoundaryLower(Number(e.target.value));
-          }}
-        />
-        <Button colorScheme="blue" onClick={() => updateInfo()}>
-          Update Boundary
-        </Button>
-        <Text fontSize="xl">Current Boundary: {currentBoundary}</Text>
-      </Flex>
+      <Info
+        approveWETH={approveWETH}
+        approveToken={approveARB}
+        boundaryLower={boundaryLower}
+        setBoundaryLower={setBoundaryLower}
+        updateInfo={updateInfo}
+        currentBoundary={currentBoundary}
+      />
 
       <Divider orientation="vertical" />
       <Flex direction="column">
