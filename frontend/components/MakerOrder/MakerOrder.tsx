@@ -45,7 +45,7 @@ const MakerOrder = ({
         }}
       />
       <Text as="b" fontSize="xs">
-        Ticks up or down from current price <br /> (negative means higher tick)
+        Ticks up or down from current price <br /> (positive means higher tick)
       </Text>
       <Input
         placeholder={"0"}
