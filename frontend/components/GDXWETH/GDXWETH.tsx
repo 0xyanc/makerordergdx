@@ -5,6 +5,7 @@ import { useAccount, useContract, useProvider, useSigner } from "wagmi";
 import MakerOrderManagerAbi from "../../abis/MakerOrderManager.json";
 import GridAbi from "../../abis/Grid.json";
 import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
+import TickCalculator from "../TickCalculator/TickCalculator";
 
 const GDXWETH = () => {
   const { address, isConnected } = useAccount();
@@ -126,7 +127,7 @@ const GDXWETH = () => {
   };
 
   return (
-    <>
+    <Flex justify="space-around" w="100%">
       <Flex direction="column">
         <Heading>GDX/WETH</Heading>
         <Button mt="1rem" colorScheme="blue" onClick={() => approveWETH()}>
@@ -193,7 +194,8 @@ const GDXWETH = () => {
           Submit Maker Orders
         </Button>
       </Flex>
-    </>
+      <TickCalculator />
+    </Flex>
   );
 };
 

@@ -5,6 +5,7 @@ import { useAccount, useContract, useProvider, useSigner } from "wagmi";
 import MakerOrderManagerAbi from "../../abis/MakerOrderManager.json";
 import GridAbi from "../../abis/Grid.json";
 import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
+import TickCalculator from "../TickCalculator/TickCalculator";
 
 const GDXETH = () => {
   const { address, isConnected } = useAccount();
@@ -104,7 +105,7 @@ const GDXETH = () => {
   };
 
   return (
-    <>
+    <Flex justify="space-around" w="100%">
       <Flex direction="column">
         <Heading>GDX/ETH</Heading>
         <Button mt="0.2rem" colorScheme="blue" onClick={() => approveGDX()}>
@@ -170,7 +171,8 @@ const GDXETH = () => {
           Submit Maker Orders
         </Button>
       </Flex>
-    </>
+      <TickCalculator />
+    </Flex>
   );
 };
 

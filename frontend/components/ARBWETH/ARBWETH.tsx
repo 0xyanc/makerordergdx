@@ -5,6 +5,7 @@ import { useAccount, useContract, useProvider, useSigner } from "wagmi";
 import MakerOrderManagerAbi from "../../abis/MakerOrderManager.json";
 import GridAbi from "../../abis/Grid.json";
 import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
+import TickCalculator from "../TickCalculator/TickCalculator";
 
 const ARBWETH = () => {
   const { address } = useAccount();
@@ -17,9 +18,6 @@ const ARBWETH = () => {
   const [currentBoundary, setCurrentBoundary] = useState<number>(0);
   const [balanceWETH, setBalanceWETH] = useState<number>(0);
   const [balanceARB, setbalanceARB] = useState<number>(0);
-  const [currentTick, setCurrentTick] = useState<string>("0");
-  const [targetTick, setTargetTick] = useState<string>("0");
-  const [numberOfTicks, setNumberOfTicks] = useState<number>(0);
 
   const makerOrderManagerAddress: `0x${string}` = "0x36E56CC52d7A0Af506D1656765510cd930fF1595";
   const gridAddress: `0x${string}` = "0x4f97f9c261d37f645669df94e5511f48d63064e2";
@@ -133,20 +131,6 @@ const ARBWETH = () => {
     await makerOrderManagerContract.placeMakerOrderInBatch(arbParams);
   };
 
-  const calculateNumberOfTicks = () => {
-    let lowerTick = currentTick > targetTick ? targetTick : currentTick;
-    let higherTick = currentTick > targetTick ? currentTick : targetTick;
-
-    let nbTicks = 0;
-    let lowerTickNumber = Number(lowerTick);
-    let higherTickNumber = Number(higherTick);
-    while (lowerTickNumber < higherTickNumber) {
-      lowerTickNumber *= 1.0005;
-      nbTicks++;
-    }
-    setNumberOfTicks(nbTicks);
-  };
-
   return (
     <Flex justify="space-around" w="100%">
       <Flex direction="column">
@@ -239,35 +223,7 @@ const ARBWETH = () => {
         </Button>
       </Flex>
       <Divider orientation="vertical" />
-      <Flex direction="column">
-        <Heading>Tick calculator</Heading>
-        <Text as="b" fontSize="xs">
-          Current tick
-        </Text>
-        <Input
-          placeholder={"0"}
-          value={currentTick}
-          onChange={(e) => {
-            setCurrentTick(e.target.value);
-          }}
-        ></Input>
-        <Text as="b" fontSize="xs">
-          Target tick
-        </Text>
-        <Input
-          placeholder={"0"}
-          value={targetTick}
-          onChange={(e) => {
-            setTargetTick(e.target.value);
-          }}
-        ></Input>
-        <Button mt="1rem" onClick={() => calculateNumberOfTicks()} colorScheme="blue">
-          Calculate
-        </Button>
-        <Text as="b" mt="1rem">
-          Number of ticks: {numberOfTicks}
-        </Text>
-      </Flex>
+      <TickCalculator />
     </Flex>
   );
 };
