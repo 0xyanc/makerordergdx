@@ -1,4 +1,4 @@
-import { Button, Flex, Heading, Input, Text } from "@chakra-ui/react";
+import { Button, Divider, Flex, Heading, Input, Text } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useAccount, useContract, useProvider, useSigner } from "wagmi";
@@ -6,6 +6,7 @@ import MakerOrderManagerAbi from "../../abis/MakerOrderManager.json";
 import GridAbi from "../../abis/Grid.json";
 import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
 import TickCalculator from "../TickCalculator/TickCalculator";
+import Info from "../Info/Info";
 
 const ARBETH = () => {
   const { address, isConnected } = useAccount();
@@ -104,6 +105,19 @@ const ARBETH = () => {
 
   return (
     <Flex justify="space-around" w="100%">
+      <Info
+        token={"ARB"}
+        isETH={true}
+        approveWETH={async () => {
+          return;
+        }}
+        approveToken={approveARB}
+        boundaryLower={boundaryLower}
+        setBoundaryLower={setBoundaryLower}
+        updateInfo={updateInfo}
+        currentBoundary={currentBoundary}
+      />
+      <Divider orientation="vertical" />
       <Flex direction="column">
         <Heading>ARB/ETH</Heading>
         <Button mt="0.2rem" colorScheme="blue" onClick={() => approveARB()}>
@@ -167,6 +181,7 @@ const ARBETH = () => {
           Submit Maker Orders
         </Button>
       </Flex>
+      <Divider orientation="vertical" />
       <TickCalculator />
     </Flex>
   );

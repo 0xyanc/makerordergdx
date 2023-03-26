@@ -132,6 +132,7 @@ const ARBWETH = () => {
     <Flex justify="space-around" w="100%">
       <Info
         token={"ARB"}
+        isETH={false}
         approveWETH={approveWETH}
         approveToken={approveARB}
         boundaryLower={boundaryLower}

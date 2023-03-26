@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction } from "react";
 
 const Info = ({
   token,
+  isETH,
   approveWETH,
   approveToken,
   boundaryLower,
@@ -11,7 +12,8 @@ const Info = ({
   currentBoundary,
 }: {
   token: string;
-  approveWETH: () => Promise<void>;
+  isETH: boolean;
+  approveWETH: () => Promise<void> | null;
   approveToken: () => Promise<void>;
   boundaryLower: number;
   setBoundaryLower: Dispatch<SetStateAction<number>>;
@@ -20,10 +22,17 @@ const Info = ({
 }) => {
   return (
     <Flex direction="column">
-      <Heading>{token}/WETH</Heading>
-      <Button mt="1rem" colorScheme="blue" onClick={() => approveWETH()}>
-        Approve WETH
-      </Button>
+      <Heading>
+        {token}/{isETH ? "ETH" : "WETH"}
+      </Heading>
+      {isETH ? (
+        <></>
+      ) : (
+        <Button mt="1rem" colorScheme="blue" onClick={() => approveWETH()}>
+          Approve WETH
+        </Button>
+      )}
+
       <Button mt="0.2rem" colorScheme="blue" onClick={() => approveToken()}>
         Approve {token}
       </Button>
