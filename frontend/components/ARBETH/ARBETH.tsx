@@ -7,13 +7,11 @@ import GridAbi from "../../abis/Grid.json";
 import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
 import TickCalculator from "../TickCalculator/TickCalculator";
 import Info from "../Info/Info";
+import MakerOrder from "../MakerOrder/MakerOrder";
 
 const ARBETH = () => {
   const { address, isConnected } = useAccount();
 
-  const [makeAmountETH, setMakeAmountETH] = useState<string>("0");
-  const [makeAmountARB, setMakeAmountARB] = useState<string>("0");
-  const [tick, setTick] = useState<string>("0");
   const [boundaryLower, setBoundaryLower] = useState<number>(0);
   const [currentBoundary, setCurrentBoundary] = useState<number>(0);
   const [balanceETH, setBalanceETH] = useState<number>(0);
@@ -68,13 +66,15 @@ const ARBETH = () => {
     await arbContract.approve(makerOrderManagerAddress, ethers.constants.MaxUint256);
   };
 
-  const submitMakerOrders = async () => {
+  const submitMakerOrders = async (makeAmountETH: string, makeAmountARB: string, tickETH: string, tickARB: string) => {
     if (makerOrderManagerContract === null || gridContract === null) return;
     const datePlus1Hour: Date = new Date();
     datePlus1Hour.setHours(datePlus1Hour.getHours() + 1);
 
-    let boundaryLowerToSubmit = boundaryLower;
-    boundaryLowerToSubmit += Number(tick) * resolution * -1;
+    let boundaryLowerToSubmitETH = boundaryLower;
+    let boundaryLowerToSubmitARB = boundaryLower;
+    boundaryLowerToSubmitETH += Number(tickETH) * resolution * -1;
+    boundaryLowerToSubmitARB += Number(tickARB) * resolution * -1;
 
     const amountETH = ethers.utils.parseEther(makeAmountETH);
     const ethParams = {
@@ -84,7 +84,7 @@ const ARBETH = () => {
       tokenB: tokenB,
       resolution,
       zero: true,
-      boundaryLower: boundaryLowerToSubmit,
+      boundaryLower: boundaryLowerToSubmitETH,
       amount: amountETH,
     };
     makerOrderManagerContract.placeMakerOrder(ethParams, { value: amountETH });
@@ -97,7 +97,7 @@ const ARBETH = () => {
       tokenB: tokenB,
       resolution,
       zero: false,
-      boundaryLower: boundaryLowerToSubmit,
+      boundaryLower: boundaryLowerToSubmitARB,
       amount: amountARB,
     };
     await makerOrderManagerContract.placeMakerOrder(arbParams);
@@ -118,69 +118,12 @@ const ARBETH = () => {
         currentBoundary={currentBoundary}
       />
       <Divider orientation="vertical" />
-      <Flex direction="column">
-        <Heading>ARB/ETH</Heading>
-        <Button mt="0.2rem" colorScheme="blue" onClick={() => approveARB()}>
-          Approve ARB
-        </Button>
-        <Text fontSize="xl">Current Boundary: {currentBoundary}</Text>
-        <Button colorScheme="blue" onClick={() => updateInfo()}>
-          Update Info
-        </Button>
-        <Flex justifyContent="space-between">
-          <Text as="b" fontSize="xs">
-            Amount ETH
-          </Text>
-          <Text fontSize="xs">
-            Balance:<Text>{numberFormat.format(balanceETH)}</Text>
-          </Text>
-        </Flex>
-        <Input
-          placeholder={"0"}
-          value={makeAmountETH}
-          onChange={(e) => {
-            setMakeAmountETH(e.target.value);
-          }}
-        />
-        <Flex justifyContent="space-between">
-          <Text as="b" fontSize="xs">
-            Amount ARB
-          </Text>
-          <Text fontSize="xs">
-            Balance:<Text>{numberFormat.format(balanceARB)}</Text>
-          </Text>
-        </Flex>
-        <Input
-          placeholder={"0"}
-          value={makeAmountARB}
-          onChange={(e) => {
-            setMakeAmountARB(e.target.value);
-          }}
-        />
-        <Text as="b" fontSize="xs">
-          Boundary Lower
-        </Text>
-        <Input
-          placeholder={"0"}
-          value={boundaryLower}
-          onChange={(e) => {
-            setBoundaryLower(Number(e.target.value));
-          }}
-        />
-        <Text as="b" fontSize="xs">
-          Ticks up or down from current price
-        </Text>
-        <Input
-          placeholder={"0"}
-          value={tick}
-          onChange={(e) => {
-            setTick(e.target.value);
-          }}
-        />
-        <Button mt="1rem" colorScheme="blue" onClick={() => submitMakerOrders()}>
-          Submit Maker Orders
-        </Button>
-      </Flex>
+      <MakerOrder
+        token={"ARB"}
+        balanceETH={balanceETH}
+        balanceToken={balanceARB}
+        submitMakerOrders={submitMakerOrders}
+      />
       <Divider orientation="vertical" />
       <TickCalculator />
     </Flex>

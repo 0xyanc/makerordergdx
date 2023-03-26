@@ -1,25 +1,25 @@
 import { Button, Divider, Flex, Heading, Input, Text } from "@chakra-ui/react";
 import { useState } from "react";
 
-const MakerOrderInBatch = ({
+const MakerOrder = ({
   token,
-  balanceWETH,
+  balanceETH,
   balanceToken,
   submitMakerOrders,
 }: {
   token: string;
-  balanceWETH: number;
+  balanceETH: number;
   balanceToken: number;
   submitMakerOrders: (
     makeAmountETH: string,
     makeAmountToken: string,
-    tickWETH: string,
+    tickETH: string,
     tickToken: string
   ) => Promise<void>;
 }) => {
   const [makeAmountETH, setMakeAmountETH] = useState<string>("0");
   const [makeAmountToken, setMakeAmountToken] = useState<string>("0");
-  const [tickWETH, setTickWETH] = useState<string>("0");
+  const [tickETH, setTickETH] = useState<string>("0");
   const [tickToken, setTickToken] = useState<string>("0");
   const numberFormat = new Intl.NumberFormat("en-US", { maximumFractionDigits: 4 });
 
@@ -31,10 +31,10 @@ const MakerOrderInBatch = ({
       </Heading>
       <Flex justifyContent="space-between">
         <Text as="b" fontSize="xs">
-          Amount WETH
+          Amount ETH
         </Text>
         <Text fontSize="xs">
-          Balance:<Text>{numberFormat.format(balanceWETH)}</Text>
+          Balance:<Text>{numberFormat.format(balanceETH)}</Text>
         </Text>
       </Flex>
       <Input
@@ -49,9 +49,9 @@ const MakerOrderInBatch = ({
       </Text>
       <Input
         placeholder={"0"}
-        value={tickWETH}
+        value={tickETH}
         onChange={(e) => {
-          setTickWETH(e.target.value);
+          setTickETH(e.target.value);
         }}
       />
       <Divider mt="1rem" />
@@ -87,7 +87,7 @@ const MakerOrderInBatch = ({
       <Button
         mt="1rem"
         colorScheme="blue"
-        onClick={() => submitMakerOrders(makeAmountETH, makeAmountToken, tickWETH, tickToken)}
+        onClick={() => submitMakerOrders(makeAmountETH, makeAmountToken, tickETH, tickToken)}
       >
         Submit Maker Orders
       </Button>
@@ -95,4 +95,4 @@ const MakerOrderInBatch = ({
   );
 };
 
-export default MakerOrderInBatch;
+export default MakerOrder;
