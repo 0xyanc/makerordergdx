@@ -7,7 +7,7 @@ import GridAbi from "../../abis/Grid.json";
 import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
 import TickCalculator from "../TickCalculator/TickCalculator";
 import Info from "../Info/Info";
-import MakerOrderWithWETH from "../MakerOrderInBatch/MakerOrderInBatch";
+import MakerOrderInBatch from "../MakerOrderInBatch/MakerOrderInBatch";
 
 const ARBWETH = () => {
   const { address } = useAccount();
@@ -141,7 +141,7 @@ const ARBWETH = () => {
       />
 
       <Divider orientation="vertical" />
-      <MakerOrderWithWETH
+      <MakerOrderInBatch
         token={"ARB"}
         balanceWETH={balanceWETH}
         balanceToken={balanceARB}

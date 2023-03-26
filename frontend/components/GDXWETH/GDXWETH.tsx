@@ -6,7 +6,7 @@ import MakerOrderManagerAbi from "../../abis/MakerOrderManager.json";
 import GridAbi from "../../abis/Grid.json";
 import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
 import TickCalculator from "../TickCalculator/TickCalculator";
-import MakerOrderWithWETH from "../MakerOrderInBatch/MakerOrderInBatch";
+import MakerOrderInBatch from "../MakerOrderInBatch/MakerOrderInBatch";
 import Info from "../Info/Info";
 
 const GDXWETH = () => {
@@ -142,7 +142,7 @@ const GDXWETH = () => {
         currentBoundary={currentBoundary}
       />
       <Divider orientation="vertical" />
-      <MakerOrderWithWETH
+      <MakerOrderInBatch
         token={"GDX"}
         balanceWETH={balanceWETH}
         balanceToken={balanceGDX}
