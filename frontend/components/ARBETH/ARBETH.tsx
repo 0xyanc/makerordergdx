@@ -73,7 +73,7 @@ const ARBETH = () => {
     datePlus1Hour.setHours(datePlus1Hour.getHours() + 1);
 
     let boundaryLowerToSubmit = boundaryLower;
-    boundaryLowerToSubmit += Number(tick) * resolution;
+    boundaryLowerToSubmit += Number(tick) * resolution * -1;
 
     const amountETH = ethers.utils.parseEther(makeAmountETH);
     const ethParams = {
