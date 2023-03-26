@@ -134,6 +134,7 @@ const GDXWETH = () => {
     <Flex justify="space-around" w="100%">
       <Info
         token={"GDX"}
+        isETH={false}
         approveWETH={approveWETH}
         approveToken={approveGDX}
         boundaryLower={boundaryLower}
