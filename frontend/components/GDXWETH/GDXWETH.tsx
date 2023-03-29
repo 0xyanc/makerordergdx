@@ -8,6 +8,7 @@ import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
 import TickCalculator from "../TickCalculator/TickCalculator";
 import MakerOrderInBatch from "../MakerOrderInBatch/MakerOrderInBatch";
 import Info from "../Info/Info";
+import AmountCalculator from "../AmountCalculator/AmountCalculator";
 
 const GDXWETH = () => {
   const { address, isConnected } = useAccount();
@@ -150,7 +151,11 @@ const GDXWETH = () => {
         submitMakerOrders={submitMakerOrders}
       />
       <Divider orientation="vertical" />
-      <TickCalculator />
+      <Flex direction="column">
+        <TickCalculator />
+        <Divider mt="1rem" mb="1rem" />
+        <AmountCalculator token={"GDX"} />
+      </Flex>
     </Flex>
   );
 };

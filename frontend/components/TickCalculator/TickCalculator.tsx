@@ -43,12 +43,12 @@ const TickCalculator = () => {
           setTargetTick(e.target.value);
         }}
       ></Input>
-      <Button mt="1rem" onClick={() => calculateNumberOfTicks()} colorScheme="blue">
-        Calculate
-      </Button>
       <Text as="b" mt="1rem">
         Number of ticks: {numberOfTicks}
       </Text>
+      <Button mt="1rem" onClick={() => calculateNumberOfTicks()} colorScheme="blue">
+        Calculate
+      </Button>
     </Flex>
   );
 };

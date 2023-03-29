@@ -8,6 +8,7 @@ import IERC20UpgradeableAbi from "../../abis/IERC20Upgradeable.json";
 import TickCalculator from "../TickCalculator/TickCalculator";
 import Info from "../Info/Info";
 import MakerOrderInBatch from "../MakerOrderInBatch/MakerOrderInBatch";
+import AmountCalculator from "../AmountCalculator/AmountCalculator";
 
 const ARBWETH = () => {
   const { address } = useAccount();
@@ -149,7 +150,11 @@ const ARBWETH = () => {
         submitMakerOrders={submitMakerOrders}
       />
       <Divider orientation="vertical" />
-      <TickCalculator />
+      <Flex direction="column">
+        <TickCalculator />
+        <Divider mt="1rem" mb="1rem" />
+        <AmountCalculator token={"ARB"} />
+      </Flex>
     </Flex>
   );
 };
