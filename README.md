@@ -1,3 +1,2 @@
 # Gridex Maker Order
-
-TODO
+Simple interface to submit maker orders on Gridex for GDX/ETH and ARB/ETH grids.
