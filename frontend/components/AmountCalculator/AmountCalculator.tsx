@@ -1,10 +1,18 @@
 import { Flex, Heading, Input, Table, TableContainer, Tbody, Td, Text, Th, Thead, Tr } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const AmountCalculator = ({ token }: { token: string }) => {
   const [price, setPrice] = useState<string>("0");
+
+  const [inputETH, setInputETH] = useState<string>("0");
+  const [inputToken, setInputToken] = useState<string>("0");
   const [outputETH, setOutputETH] = useState<string>("0");
   const [outputToken, setOutputToken] = useState<string>("0");
+
+  useEffect(() => {
+    calculateOutputETH(inputToken);
+    calculateOutputToken(inputETH);
+  }, [price]);
 
   const calculateOutputETH = (inputToken: string) => {
     const amount = Number(inputToken) * Number(price);
@@ -46,6 +54,7 @@ const AmountCalculator = ({ token }: { token: string }) => {
                   width="auto"
                   placeholder={"0"}
                   onChange={(e) => {
+                    setInputETH(e.target.value);
                     calculateOutputToken(e.target.value);
                   }}
                 />
@@ -64,6 +73,7 @@ const AmountCalculator = ({ token }: { token: string }) => {
                   width="auto"
                   placeholder={"0"}
                   onChange={(e) => {
+                    setInputToken(e.target.value);
                     calculateOutputETH(e.target.value);
                   }}
                 />
