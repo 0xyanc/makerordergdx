@@ -50,7 +50,7 @@ const Info = ({
         Update Info
       </Button>
       <Text fontSize="xl">Current Boundary: {currentBoundary}</Text>
-      <Text fontSize="xl">Current Price: {Math.pow(1.0005, Math.abs(currentBoundary / 5) * -1).toFixed(10)}</Text>
+      <Text fontSize="xl">Current Price: {Math.pow(1.0005, Math.abs(currentBoundary / 5 + 1) * -1 - 1.93).toFixed(10)}</Text>
     </Flex>
   );
 };
